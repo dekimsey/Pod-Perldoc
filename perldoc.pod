@@ -5,36 +5,39 @@ perldoc - Look up Perl documentation in Pod format.
 
 =head1 SYNOPSIS
 
-B<perldoc> [B<-h>] [B<-D>] [B<-t>] [B<-u>] [B<-m>] [B<-l>] [B<-F>]
-[B<-i>] [B<-V>] [B<-T>] [B<-r>]
-[B<-dI<destination_file>>]
-[B<-oI<formatname>>]
-[B<-MI<FormatterClassName>>]
-[B<-wI<formatteroption:value>>]
-[B<-n>I<nroff-replacement>]
-[B<-X>]
-[B<-L> I<language_code>]
-PageName|ModuleName|ProgramName
+    perldoc [-h] [-D] [-t] [-u] [-m] [-l] [-U] [-F]
+        [-i] [-V] [-T] [-r]
+        [-d destination_file]
+        [-o formatname]
+        [-M FormatterClassName]
+        [-w formatteroption:value]
+        [-n nroff-replacement]
+        [-X]
+        [-L language_code]
+        PageName|ModuleName|ProgramName|URL
 
-B<perldoc> B<-f> BuiltinFunction
+Examples:
 
-B<perldoc> B<-L> it B<-f> BuiltinFunction
+    perldoc -f BuiltinFunction
 
-B<perldoc> B<-q> FAQ Keyword
+    perldoc -L it -f BuiltinFunction
 
-B<perldoc> B<-L> fr B<-q> FAQ Keyword
+    perldoc -q FAQ Keyword
 
-B<perldoc> B<-v> PerlVariable
+    perldoc -L fr -q FAQ Keyword
+
+    perldoc -v PerlVariable
+
+    perldoc -a PerlAPI
 
 See below for more description of the switches.
 
 =head1 DESCRIPTION
 
-I<perldoc> looks up a piece of documentation in .pod format that is embedded
-in the perl installation tree or in a perl script, and displays it via
-C<pod2man | nroff -man | $PAGER>. (In addition, if running under HP-UX,
-C<col -x> will be used.) This is primarily used for the documentation for
-the perl library modules.
+B<perldoc> looks up documentation in .pod format that is embedded in the perl
+installation tree or in a perl script, and displays it using a variety of
+formatters.  This is primarily used for the documentation for the perl library
+modules.
 
 Your system may also have man pages installed for those modules, in
 which case you can probably just use the man(1) command.
@@ -74,13 +77,21 @@ the file for you and simply hand it off for display.
 
 Display onB<l>y the file name of the module found.
 
+=item B<-U>
+
+When running as the superuser, don't attempt drop privileges for security.
+This option is implied with B<-F>.
+
+B<NOTE>: Please see the heading SECURITY below for more information.
+
 =item B<-F>
 
 Consider arguments as file names; no search in directories will be performed.
+Implies B<-U> if run as the superuser.
 
 =item B<-f> I<perlfunc>
 
-The B<-f> option followed by the name of a perl built in function will
+The B<-f> option followed by the name of a perl built-in function will
 extract the documentation of this function from L<perlfunc>.
 
 Example:
@@ -98,6 +109,14 @@ Example:
 
      perldoc -q shuffle
 
+=item B<-a> I<perlapifunc>
+
+The B<-a> option followed by the name of a perl api function will
+extract the documentation of this function from L<perlapi>.
+
+Example:
+
+     perldoc -a newHV
 
 =item B<-v> I<perlvar>
 
@@ -114,7 +133,7 @@ Examples:
 =item B<-T>
 
 This specifies that the output is not to be sent to a pager, but is to
-be sent right to STDOUT.
+be sent directly to STDOUT.
 
 =item B<-d> I<destination-filename>
 
@@ -146,7 +165,7 @@ For example: C<perldoc -MPod::Perldoc::ToChecker>.
 You can specify several classes to try by joining them with commas
 or semicolons, as in C<-MTk::SuperPod;Tk::Pod>.
 
-=item B<-w> I<option:value> or B<-w> I<option> 
+=item B<-w> I<option:value> or B<-w> I<option>
 
 This specifies an option to call the formatter B<w>ith.  For example,
 C<-w textsize:15> will call
@@ -160,31 +179,32 @@ You can use C<-w optionname> (without a value) as shorthand for
 C<-w optionname:I<TRUE>>.  This is presumably useful in cases of on/off
 features like: C<-w page_numbering>.
 
-You can use a "=" instead of the ":", as in: C<-w textsize=15>.  This
+You can use an "=" instead of the ":", as in: C<-w textsize=15>.  This
 might be more (or less) convenient, depending on what shell you use.
 
 =item B<-X>
 
-Use an index if it is present -- the B<-X> option looks for an entry
+Use an index if it is present. The B<-X> option looks for an entry
 whose basename matches the name given on the command line in the file
 C<$Config{archlib}/pod.idx>. The F<pod.idx> file should contain fully
 qualified filenames, one per line.
 
 =item B<-L> I<language_code>
 
-This allows to specify the I<language code> for desired language translation.
-If C<POD2::E<lt>language_codeE<gt>> package doesn't exist (or isn't installed
-in your system), the switch will be ignored. 
-All available translation packages should be found under the C<POD2::>
-namespace. See L<POD2::IT> (or L<POD2::FR>) in order to see how to create and
-integrate new localized C<POD2::*> pod documentation packages in
+This allows one to specify the I<language code> for the desired language
+translation. If the C<POD2::E<lt>language_codeE<gt>> package isn't
+installed in your system, the switch is ignored.
+All available translation packages are to be found under the C<POD2::>
+namespace. See L<POD2::IT> (or L<POD2::FR>) to see how to create new
+localized C<POD2::*> documentation packages and integrate them into
 L<Pod::Perldoc>.
 
-=item B<PageName|ModuleName|ProgramName>
+=item B<PageName|ModuleName|ProgramName|URL>
 
 The item you want to look up.  Nested modules (such as C<File::Basename>)
-are specified either as C<File::Basename> or C<File/Basename>.  You may also
-give a descriptive name of a page, such as C<perlfunc>.
+are specified either as C<File::Basename> or C<< File/Basename >>.  You may also
+give a descriptive name of a page, such as C<perlfunc>.  For URLs, HTTP and
+HTTPS are the only kind currently supported.
 
 For simple names like 'foo', when the normal search fails to find
 a matching page, a search with the "perl" prefix is tried as well.
@@ -192,7 +212,7 @@ So "perldoc intro" is enough to find/render "perlintro.pod".
 
 =item B<-n> I<some-formatter>
 
-Specify replacement for nroff
+Specify replacement for groff
 
 =item B<-r>
 
@@ -208,25 +228,29 @@ Displays the version of perldoc you're running.
 
 =back
 
-
-
 =head1 SECURITY
 
 Because B<perldoc> does not run properly tainted, and is known to
 have security issues, when run as the superuser it will attempt to
 drop privileges by setting the effective and real IDs to nobody's
 or nouser's account, or -2 if unavailable.  If it cannot relinquish
-its privileges, it will not run.  
+its privileges, it will not run.
 
+See the C<-U> option if you do not want this behavior but B<beware>
+that there are significant security risks if you choose to use C<-U>.
+
+Since 3.26, using C<-F> as the superuser also implies C<-U> as opening
+most files and traversing directories requires privileges that are
+above the nobody/nogroup level.
 
 =head1 ENVIRONMENT
 
 Any switches in the C<PERLDOC> environment variable will be used before the
 command line arguments.
 
-Useful values for C<PERLDOC> include C<-oman>, C<-otext>, C<-otk>, C<-ortf>,
+Useful values for C<PERLDOC> include C<-oterm>, C<-otext>, C<-ortf>,
 C<-oxml>, and so on, depending on what modules you have on hand; or
-exactly specify the formatter class with C<-MPod::Perldoc::ToMan>
+the formatter class may be specified exactly with C<-MPod::Perldoc::ToTerm>
 or the like.
 
 C<perldoc> also searches directories
@@ -235,15 +259,26 @@ defined) and C<PATH> environment variables.
 (The latter is so that embedded pods for executables, such as
 C<perldoc> itself, are available.)
 
+In directories where either C<Makefile.PL> or C<Build.PL> exist, C<perldoc>
+will add C<.> and C<lib> first to its search path, and as long as you're not
+the superuser will add C<blib> too.  This is really helpful if you're working
+inside of a build directory and want to read through the docs even if you
+have a version of a module previously installed.
+
 C<perldoc> will use, in order of preference, the pager defined in
 C<PERLDOC_PAGER>, C<MANPAGER>, or C<PAGER> before trying to find a pager
 on its own. (C<MANPAGER> is not used if C<perldoc> was told to display
 plain text or unformatted pod.)
 
+When using perldoc in it's C<-m> mode (display module source code),
+C<perldoc> will attempt to use the pager set in C<PERLDOC_SRC_PAGER>.
+A useful setting for this command is your favorite editor as in
+C</usr/bin/nano>. (Don't judge me.)
+
 One useful value for C<PERLDOC_PAGER> is C<less -+C -E>.
 
 Having PERLDOCDEBUG set to a positive integer will make perldoc emit
-even more descriptive output than the C<-v> switch does -- the higher the
+even more descriptive output than the C<-D> switch does; the higher the
 number, the more it emits.
 
 
@@ -252,16 +287,20 @@ number, the more it emits.
 Up to 3.14_05, the switch B<-v> was used to produce verbose
 messages of B<perldoc> operation, which is now enabled by B<-D>.
 
+=head1 SEE ALSO
+
+L<perlpod>, L<Pod::Perldoc>
 
 =head1 AUTHOR
 
-Current maintainer: Adriano R. Ferreira <ferreira@cpan.org>
+Current maintainer: Mark Allen C<< <mallen@cpan.org> >>
 
 Past contributors are:
-Sean M. Burke <sburke@cpan.org>,
-Kenneth Albanowski <kjahds@kjahds.com>,
-Andy Dougherty  <doughera@lafcol.lafayette.edu>,
+brian d foy C<< <bdfoy@cpan.org> >> 
+Adriano R. Ferreira C<< <ferreira@cpan.org> >>,
+Sean M. Burke C<< <sburke@cpan.org> >>,
+Kenneth Albanowski C<< <kjahds@kjahds.com> >>,
+Andy Dougherty  C<< <doughera@lafcol.lafayette.edu> >>,
 and many others.
 
 =cut
-

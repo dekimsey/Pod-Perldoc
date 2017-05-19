@@ -1,17 +1,12 @@
+use Test::More tests => 1;
 
-require 5;
-# Time-stamp: "2004-04-09 18:02:36 ADT"
+pass();
 
-# Summary of, well, things.
+__END__
 
-use Test;
-BEGIN {plan tests => 2};
-
-ok 1;
-
-use Pod::Perldoc;
-
-#chdir "t" if -e "t";
+BEGIN {
+    use_ok 'Pod::Perldoc';
+}
 
 {
   my @out;
@@ -82,6 +77,3 @@ print "# \%INC:\n";
 foreach my $x (sort {lc($a) cmp lc($b)} keys %INC) {
   print "#   [$x] = [", $INC{$x} || '', "]\n";
 }
-
-ok 1;
-
